@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - .agents/skills/publishing-skills-to-amp/**
+      - SKILL.md
       - .github/scripts/publish-to-amp.sh
       - .github/workflows/publish-skill.yml
   workflow_dispatch:
@@ -32,8 +32,8 @@ jobs:
         run: |
           set -euo pipefail
           script="$GITHUB_WORKSPACE/.github/scripts/publish-to-amp.sh"
-          skill_dir="$GITHUB_WORKSPACE/.agents/skills/publishing-skills-to-amp"
-          AMP_API_KEY="$AMP_API_KEY_GMAIL" bash "$script" publishing-skills-to-amp \
+          skill_dir="$GITHUB_WORKSPACE"
+          AMP_API_KEY="$AMP_API_KEY_GMAIL" bash "$script" sync-skill-to-amp \
             "$skill_dir" "$RUNNER_TEMP/user-skills-gmail"
-          AMP_API_KEY="$AMP_API_KEY_UTAH" bash "$script" publishing-skills-to-amp \
+          AMP_API_KEY="$AMP_API_KEY_UTAH" bash "$script" sync-skill-to-amp \
             "$skill_dir" "$RUNNER_TEMP/user-skills-utah"
