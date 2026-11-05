@@ -1,0 +1,39 @@
+name: Publish skill to Amp User Skills
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .agents/skills/publishing-skills-to-amp/**
+      - .github/scripts/publish-to-amp.sh
+      - .github/workflows/publish-skill.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-skill-to-amp
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --global @ampcode/cli
+      - name: Publish to each Amp account
+        env:
+          AMP_API_KEY_GMAIL: ${{ secrets.AMP_API_KEY_GMAIL }}
+          AMP_API_KEY_UTAH: ${{ secrets.AMP_API_KEY_UTAH }}
+        run: |
+          set -euo pipefail
+          script="$GITHUB_WORKSPACE/.github/scripts/publish-to-amp.sh"
+          skill_dir="$GITHUB_WORKSPACE/.agents/skills/publishing-skills-to-amp"
+          AMP_API_KEY="$AMP_API_KEY_GMAIL" bash "$script" publishing-skills-to-amp \
+            "$skill_dir" "$RUNNER_TEMP/user-skills-gmail"
+          AMP_API_KEY="$AMP_API_KEY_UTAH" bash "$script" publishing-skills-to-amp \
+            "$skill_dir" "$RUNNER_TEMP/user-skills-utah"
